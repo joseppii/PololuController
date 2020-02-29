@@ -33,4 +33,25 @@
 
 #include "ros/ros.h"
 
+
+namespace pololu {
+
+class Channel
+{
+private:
+	ros::NodeHandle nh_;
+	int channelId_;
+
+	ros::Subscriber sub_cmd_;
+	ros::Publisher pub_feedback_;
+
+public:
+	Channel(int channel_id, std::string nh);
+	~Channel();
+	//void cmdCallback();
+};
+
+
+
+} //namespace pololu
 #endif

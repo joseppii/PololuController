@@ -33,4 +33,31 @@
 
 #include "ros/ros.h"
 
+namespace pololu 
+{
+
+class Channel;
+
+class Controller {
+
+private:
+	bool connected_;
+	std::vector<Channel*> channels_;
+	ros::NodeHandle nh_;
+
+public:
+
+	Controller();
+	~Controller();
+
+	void addChannel(pololu::Channel *channel) ;
+	void connect();
+	bool connected() { return connected_; };
+
+};
+
+} // namespace pololu
+
+
+
 #endif
