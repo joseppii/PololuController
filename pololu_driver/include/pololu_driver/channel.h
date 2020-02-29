@@ -32,7 +32,7 @@
 #define POLOLU_CHANNEL
 
 #include "ros/ros.h"
-
+#include "std_msgs/String.h"
 
 namespace pololu {
 
@@ -42,13 +42,13 @@ private:
 	ros::NodeHandle nh_;
 	int channelId_;
 
-	ros::Subscriber sub_cmd_;
-	ros::Publisher pub_feedback_;
+	ros::Subscriber command_sub_;
+	ros::Publisher feedback_pub_;
 
 public:
 	Channel(int channel_id, std::string nh);
 	~Channel();
-	//void cmdCallback();
+//void cmdCallback(const roboteq_msgs::Command &cmd);
 };
 
 
