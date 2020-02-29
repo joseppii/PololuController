@@ -36,5 +36,14 @@
 int main(int argc, char **argv) {
   ros::init(argc, argv, "~");
   ros::NodeHandle nh("~");
+
+  std::string port = "/dev/i2c-3";
+  
+  pololu::Controller motorController;
+
+  pololu::Channel channel(0, "~");
+  motorController.addChannel(&channel);
+  motorController.connect();
+
   return 0;
 }

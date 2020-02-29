@@ -28,3 +28,17 @@
 * Please send comments, questions, or patches to the author i.piperakis@gmail.com
 *
 */
+#include "pololu_driver/channel.h"
+
+namespace pololu {
+
+
+Channel::Channel(int channel_id, std::string nh) : channelId_(channel_id), nh_(nh) {
+
+}
+
+Channel::~Channel() {
+
+}
+
+} //namespace pololu

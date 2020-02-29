@@ -28,3 +28,25 @@
 * Please send comments, questions, or patches to the author i.piperakis@gmail.com
 *
 */
+#include "pololu_driver/controller.h"
+#include "pololu_driver/channel.h"
+
+namespace pololu {
+
+Controller::Controller () : nh_("~"), connected_(false) {
+
+}
+
+Controller::~Controller () { 
+
+}
+
+void Controller::connect() {
+
+}
+
+void Controller::addChannel(pololu::Channel *channel) {
+	channels_.push_back(channel);
+}
+
+} // namespace pololu
