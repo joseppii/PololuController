@@ -35,15 +35,16 @@ namespace pololu {
 
 Channel::Channel(int channel_id, std::string nh) : channelId_(channel_id), nh_(nh) {
 	feedback_pub_ = nh_.advertise<std_msgs::String>("feedback", 1);
+	command_sub_ = nh_.subscribe("cmd", 1, &Channel::cmdCallback, this);
 }
 
 Channel::~Channel() {
 
 }
 
-/*void Channel::cmdCallback(const roboteq_msgs::Command &cmd) {
+void Channel::cmdCallback(const std_msgs::String &cmd) {
 
-}*/
+}
 
 
 } //namespace pololu

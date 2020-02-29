@@ -48,7 +48,7 @@ private:
 public:
 	Channel(int channel_id, std::string nh);
 	~Channel();
-//void cmdCallback(const roboteq_msgs::Command &cmd);
+	void cmdCallback(const std_msgs::String &cmd);
 };
 
 
