@@ -1,0 +1,5 @@
+<launch>
+  <arg name="port" default="/dev/ttyACM0" />
+  <node pkg="pololu_driver" type="driver_node" name="pololu_driver" output="screen">
+  </node>
+</launch>
