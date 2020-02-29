@@ -38,12 +38,19 @@ int main(int argc, char **argv) {
   ros::NodeHandle nh("~");
 
   std::string port = "/dev/i2c-3";
-  
+  ros::Rate loop_rate(1);
+
   pololu::Controller motorController;
 
   pololu::Channel channel(0, "~");
   motorController.addChannel(&channel);
   motorController.connect();
+
+  while (ros::ok()) {
+    ROS_INFO("It's alive!!!!!!\n");
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
 
   return 0;
 }
