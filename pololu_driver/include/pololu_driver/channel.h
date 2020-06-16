@@ -33,22 +33,25 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-
+#include "jackal_msgs/Drive.h"
 namespace pololu {
+
+class Controller;
 
 class Channel
 {
 private:
-	ros::NodeHandle nh_;
-	int channelId_;
-
-	ros::Subscriber command_sub_;
-	ros::Publisher feedback_pub_;
+	ros::NodeHandle _nh;
+	int _channelId;
+	std::string _name;
+	Controller* _controller;
+	ros::Subscriber _command_sub;
+	ros::Publisher _feedback_pub;
 
 public:
-	Channel(int channel_id, std::string nh);
+	Channel(int channel_id, std::string name, std::string nh, Controller* contr);
 	~Channel();
-	void cmdCallback(const std_msgs::String &cmd);
+	void cmdCallback(const jackal_msgs::Drive::ConstPtr& msg);
 };
 
 

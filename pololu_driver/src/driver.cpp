@@ -34,19 +34,34 @@
 #include "ros/ros.h"
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "~");
+  ros::init(argc, argv, "phylax_teleop_joy_velocity");
   ros::NodeHandle nh("~");
 
-  std::string port = "/dev/i2c-3";
-  ros::Rate loop_rate(1);
+  std::string port = "/dev/ttyACM0";
+  int32_t baud = 115200;
+  ros::Rate loop_rate(10);
 
-  pololu::Controller motorController;
+  pololu::Controller motorController(port.c_str(), baud);
 
-  pololu::Channel channel(0, "~");
-  motorController.addChannel(&channel);
-  motorController.connect();
+ // pololu::Channel channel(0, "~");
+  motorController.addChannel(0, "left_wheel", "~");
+  
 
   while (ros::ok()) {
+    ROS_DEBUG("Attempting connection to %s at %i baud.", port.c_str(), baud);
+    motorController.connect();
+    if (motorController.connected()) {
+      ros::AsyncSpinner spinner(1);
+      spinner.start();
+      while (ros::ok()) {
+        motorController.spinOnce();
+      }
+      spinner.stop();      
+    } else {
+      ROS_DEBUG("Problem connecting to serial device.");
+      ROS_ERROR_STREAM_ONCE("Problem connecting to port " << port << ". Trying again every 1 second.");
+      sleep(1);
+    }  
     ROS_INFO("It's alive!!!!!!\n");
     ros::spinOnce();
     loop_rate.sleep();

@@ -28,25 +28,110 @@
 * Please send comments, questions, or patches to the author i.piperakis@gmail.com
 *
 */
+
+#include <string>
+#include <iostream>
+#include <cstdio>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <termios.h>
+
 #include "pololu_driver/controller.h"
 #include "pololu_driver/channel.h"
+#include "serial/serial.h"
+
+using namespace serial;
 
 namespace pololu {
 
-Controller::Controller () : nh_("~"), connected_(false) {
 
+Controller::Controller (const char *port, int baud) : _nh("~"), _connected(false), _port(port), _baud(baud) {}
+
+Controller::~Controller () {}
+
+void Controller::connect() 
+{
+	int result = 0;
+	if (!_serial) 
+		_serial = std::make_unique<serial::Serial> (_port, _baud, serial::Timeout::simpleTimeout(500));
+
+	if (_serial->isOpen()) {
+		ROS_INFO("Connection with serial on port %s",_port);
+		_connected = true;
+		result = exitSafeStart();
+		return;
+	} else {
+		_connected = false;
+		ROS_INFO("No Connection with serial port %s",_port);
+	}
+
+  	ROS_INFO("Motor controller not responding.");	  
 }
 
-Controller::~Controller () { 
-
+void Controller::read()
+{
+	ROS_DEBUG_STREAM_NAMED("serial", "Bytes waiting: " << _serial->available());
 }
 
-void Controller::connect() {
-
+void Controller::addChannel(int index, std::string name, std::string nh) 
+{
+	_channels.emplace_back(std::make_unique<pololu::Channel>(index, name, nh, this));
 }
 
-void Controller::addChannel(pololu::Channel *channel) {
-	channels_.push_back(channel);
+int Controller::exitSafeStart()
+{
+  const uint8_t command = 0x83;
+
+  int result = _serial->write(&command, 1);
+  return result;
+}
+int Controller::setTargetSpeed(int speed)
+{
+  uint8_t command[3];
+
+  if (speed < 0)
+  {
+    command[0] = 0x86; // Motor Reverse
+    speed = -speed;
+  }
+  else
+  {
+    command[0] = 0x85; // Motor Forward
+  }
+  command[1] = speed & 0x1F;
+  command[2] = speed >> 5 & 0x7F;
+
+  return _serial->write(command, sizeof(command));
+}
+
+int Controller::getVariable(uint8_t variable_id, uint16_t * value)
+{
+  uint8_t command[] = { 0xA1, variable_id };
+  int result = _serial->write(command, sizeof(command));
+  if (result) { return -1; }
+  uint8_t response[2];
+  ssize_t received = _serial->read(response, sizeof(response));
+  if (received < 0) { return -1; }
+  if (received != 2)
+  {
+    fprintf(stderr, "read timeout: expected 2 bytes, got %zu\n", received);
+    return -1;
+  }
+  *value = response[0] + 256 * response[1];
+  return 0;
+}
+
+int Controller::getTargetSpeed(int16_t * value)
+{
+  return getVariable(20, (uint16_t *)value);
+}
+
+int Controller::getErrorStatus(uint16_t * value)
+{
+  return getVariable(0, value);
 }
 
 } // namespace pololu
+

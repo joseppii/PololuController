@@ -29,22 +29,39 @@
 *
 */
 #include "pololu_driver/channel.h"
+#include "pololu_driver/controller.h"
 
-namespace pololu {
+namespace pololu 
+{
 
+Channel::Channel(int channel_id, std::string name, std::string nh,Controller* contr) : _channelId(channel_id), _name(name), _nh(nh),_controller(contr) {
+	_feedback_pub = _nh.advertise<std_msgs::String>("feedback", 1);
+	_command_sub = _nh.subscribe("/cmd_drive", 1, &Channel::cmdCallback, this);
+	
+	if (_controller != NULL)
+	{
+		ROS_INFO("Oh yeah exitted safe start!");
+	}
+	else
+	{
 
-Channel::Channel(int channel_id, std::string nh) : channelId_(channel_id), nh_(nh) {
-	feedback_pub_ = nh_.advertise<std_msgs::String>("feedback", 1);
-	command_sub_ = nh_.subscribe("cmd", 1, &Channel::cmdCallback, this);
+		ROS_INFO("Oopppps cannot exit safe start!");
+	}
+	
 }
 
 Channel::~Channel() {
 
 }
 
-void Channel::cmdCallback(const std_msgs::String &cmd) {
+void Channel::cmdCallback(const jackal_msgs::Drive::ConstPtr& msg) {
 
+	float left_cmd = msg->drivers[jackal_msgs::Drive::LEFT];
+	float right_cmd = msg->drivers[jackal_msgs::Drive::RIGHT];
+	ROS_INFO("Value for left motor %f", left_cmd);
+	ROS_INFO("Value for right motor %f", right_cmd);
+	int16_t new_speed = int16_t(left_cmd);
+	int result = _controller->setTargetSpeed(new_speed);
 }
-
 
 } //namespace pololu

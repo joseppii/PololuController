@@ -31,29 +31,50 @@
 #ifndef POLOLU_CONTROLLER
 #define POLOLU_CONTROLLER
 
+#include <memory>
 #include "ros/ros.h"
+
+
+namespace serial {
+  class Serial;
+}
 
 namespace pololu 
 {
 
 class Channel;
 
-class Controller {
+class Controller : public std::enable_shared_from_this<Controller>  {
 
 private:
-	bool connected_;
-	std::vector<Channel*> channels_;
-	ros::NodeHandle nh_;
+	const char *_port;
+	uint32_t _baud;
+	bool _connected;
+	std::unique_ptr<serial::Serial> _serial;
 
+	std::vector<std::unique_ptr<pololu::Channel> >_channels;
+	ros::NodeHandle _nh;
+	ros::Publisher _pub_status;
+
+	void read();
+	void processStatus(std::string msg);
+	void processFeedback(std::string msg);
 public:
 
-	Controller();
+	Controller(const char *port, int baud);
 	~Controller();
+	int exitSafeStart();
+	int setTargetSpeed(int speed);
+	int getTargetSpeed(int16_t * value);
+	int getVariable(uint8_t variable_id, uint16_t * value);
+	int getErrorStatus(uint16_t * value);
 
-	void addChannel(pololu::Channel *channel) ;
+	void addChannel(int index, std::string name, std::string nh) ;
 	void connect();
-	bool connected() { return connected_; };
+	bool connected() { return _connected; };
+    void spinOnce() { read(); }
 
+	std::shared_ptr<Controller> get_shared_this() { return shared_from_this(); }
 };
 
 } // namespace pololu
