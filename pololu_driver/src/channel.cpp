@@ -54,10 +54,10 @@ Channel::~Channel() {
 
 }
 
-void Channel::cmdCallback(const jackal_msgs::Drive::ConstPtr& msg) {
+void Channel::cmdCallback(const phylax_msgs::Drive::ConstPtr& msg) {
 
-	float left_cmd = msg->drivers[jackal_msgs::Drive::LEFT];
-	float right_cmd = msg->drivers[jackal_msgs::Drive::RIGHT];
+	float left_cmd = msg->drivers[phylax_msgs::Drive::LEFT];
+	float right_cmd = msg->drivers[phylax_msgs::Drive::RIGHT];
 	ROS_INFO("Value for left motor %f", left_cmd);
 	ROS_INFO("Value for right motor %f", right_cmd);
 	int16_t new_speed = int16_t(left_cmd);

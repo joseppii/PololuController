@@ -33,7 +33,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "jackal_msgs/Drive.h"
+#include "phylax_msgs/Drive.h"
 namespace pololu {
 
 class Controller;
@@ -51,7 +51,7 @@ private:
 public:
 	Channel(int channel_id, std::string name, std::string nh, Controller* contr);
 	~Channel();
-	void cmdCallback(const jackal_msgs::Drive::ConstPtr& msg);
+	void cmdCallback(const phylax_msgs::Drive::ConstPtr& msg);
 };
 
 

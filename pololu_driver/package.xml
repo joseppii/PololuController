@@ -17,7 +17,7 @@
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>serial</build_depend>
-  <build_depend>jackal_msgs</build_depend>
+  <build_depend>phylax_msgs</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
@@ -27,7 +27,7 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>serial</exec_depend>
-  <exec_depend>jackal_msgs</exec_depend>
+  <exec_depend>phylax_msgs</exec_depend>
   <export>
   </export>
 </package>
