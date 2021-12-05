@@ -64,7 +64,7 @@ void Controller::connect()
 		return;
 	} else {
 		_connected = false;
-		ROS_INFO("No Connection with serial port %s",_port);
+		ROS_ERROR("No Connection with serial port %s",_port);
 	}
 
   	ROS_INFO("Motor controller not responding.");	  

@@ -36,7 +36,7 @@ namespace pololu
 
 Channel::Channel(int channel_id, std::string name, std::string nh,Controller* contr) : _channelId(channel_id), _name(name), _nh(nh),_controller(contr) {
 	_feedback_pub = _nh.advertise<std_msgs::String>("feedback", 1);
-	_command_sub = _nh.subscribe("/cmd_drive", 1, &Channel::cmdCallback, this);
+	_command_sub = _nh.subscribe("/phylax_node/cmd_drive", 1, &Channel::cmdCallback, this);
 	
 	if (_controller != NULL)
 	{
@@ -56,12 +56,17 @@ Channel::~Channel() {
 
 void Channel::cmdCallback(const phylax_msgs::Drive::ConstPtr& msg) {
 
-	float left_cmd = msg->drivers[phylax_msgs::Drive::LEFT];
-	float right_cmd = msg->drivers[phylax_msgs::Drive::RIGHT];
-	ROS_INFO("Value for left motor %f", left_cmd);
-	ROS_INFO("Value for right motor %f", right_cmd);
-	int16_t new_speed = int16_t(left_cmd);
-	int result = _controller->setTargetSpeed(new_speed);
+	if (msg->mode == phylax_msgs::Drive::MODE_PWM) {
+		float cmd = msg->drivers[_channelId];
+		
+		ROS_INFO("Value for motor %d is: %f", _channelId, cmd);
+		
+		int16_t speed = int16_t(cmd);
+		int result = _controller->setTargetSpeed(speed);
+	} else if (msg->mode == phylax_msgs::Drive::MODE_NONE) {
+		ROS_INFO("Communication with input controller lost. Safety stop invoked on channel %d!", _channelId);
+		int result = _controller->setTargetSpeed(0);
+	}
 }
 
 } //namespace pololu

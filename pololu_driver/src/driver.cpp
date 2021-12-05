@@ -37,29 +37,35 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "phylax_teleop_joy_velocity");
   ros::NodeHandle nh("~");
 
-  std::string port = "/dev/ttyACM0";
+  std::string port0 = "/dev/ttyACM0";
+  std::string port1 = "/dev/ttyACM1";
   int32_t baud = 115200;
   ros::Rate loop_rate(10);
 
-  pololu::Controller motorController(port.c_str(), baud);
+  pololu::Controller motorController0(port0.c_str(), baud);
+  pololu::Controller motorController1(port1.c_str(), baud);
 
  // pololu::Channel channel(0, "~");
-  motorController.addChannel(0, "left_wheel", "~");
+  motorController0.addChannel(phylax_msgs::Drive::LEFT, "left_wheel", "~");
+  motorController1.addChannel(phylax_msgs::Drive::RIGHT, "right_wheel", "~");
   
 
   while (ros::ok()) {
-    ROS_DEBUG("Attempting connection to %s at %i baud.", port.c_str(), baud);
-    motorController.connect();
-    if (motorController.connected()) {
+    ROS_DEBUG("Attempting connection to %s at %i baud.", port0.c_str(), baud);
+    motorController0.connect();
+    motorController1.connect();
+    
+    if (motorController0.connected() && motorController1.connected()) {
       ros::AsyncSpinner spinner(1);
       spinner.start();
       while (ros::ok()) {
-        motorController.spinOnce();
+        motorController0.spinOnce();
+        motorController1.spinOnce();
       }
       spinner.stop();      
     } else {
       ROS_DEBUG("Problem connecting to serial device.");
-      ROS_ERROR_STREAM_ONCE("Problem connecting to port " << port << ". Trying again every 1 second.");
+      ROS_ERROR_STREAM_ONCE("Problem connecting to port " << port0 << ". Trying again every 1 second.");
       sleep(1);
     }  
     ROS_INFO("It's alive!!!!!!\n");
